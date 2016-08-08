@@ -8,6 +8,7 @@ import android.widget.ImageView;
 /**
  * Default implementation of MediaLoader for images from id or bitmap
  */
+@Deprecated
 public class DefaultImageLoader implements MediaLoader {
     private int mId;
     private Bitmap mBitmap;

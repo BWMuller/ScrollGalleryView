@@ -6,11 +6,13 @@ import android.support.v4.view.ViewPager;
 
 import com.veinhorn.scrollgalleryview.MediaInfo;
 import com.veinhorn.scrollgalleryview.ScrollGalleryView;
+import com.veinhorn.scrollgalleryview.ScrollGalleryViewException;
 
 import java.util.List;
 
 public class GalleryBuilder implements Gallery<GalleryBuilder> {
     private Activity activity;
+    private FragmentManager fragmentManager;
     private ScrollGalleryView gallery;
 
     public GalleryBuilder(Activity activity) {
@@ -23,6 +25,7 @@ public class GalleryBuilder implements Gallery<GalleryBuilder> {
     }
 
     @Override public GalleryBuilder withFragmentManager(FragmentManager fragmentManager) {
+        this.fragmentManager = fragmentManager;
         gallery.setFragmentManager(fragmentManager);
         return this;
     }
@@ -57,7 +60,9 @@ public class GalleryBuilder implements Gallery<GalleryBuilder> {
         return this;
     }
 
-    public ScrollGalleryView build() {
+    public ScrollGalleryView build() throws ScrollGalleryViewException {
+        if (fragmentManager == null)
+            throw new ScrollGalleryViewException("FragmentManager is not initialized.");
         return gallery;
     }
 }

@@ -1,9 +1,6 @@
 package com.veinhorn.scrollgalleryview;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.veinhorn.scrollgalleryview.loader.MediaLoader;
-
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Created by veinhorn on 29.8.15.
@@ -23,7 +18,7 @@ public class ImageFragment extends Fragment {
 
     private HackyViewPager viewPager;
     private ImageView backgroundImage;
-    private PhotoViewAttacher photoViewAttacher;
+    // private PhotoViewAttacher photoViewAttacher;
 
     public void setMediaInfo(MediaInfo mediaInfo) {
         mMediaInfo = mediaInfo;
@@ -36,12 +31,12 @@ public class ImageFragment extends Fragment {
         backgroundImage = (ImageView) rootView.findViewById(R.id.backgroundImage);
         viewPager = (HackyViewPager) getActivity().findViewById(R.id.viewPager);
 
-        if (savedInstanceState != null) {
+        /*if (savedInstanceState != null) {
             boolean isLocked = savedInstanceState.getBoolean(Constants.IS_LOCKED, false);
             viewPager.setLocked(isLocked);
             backgroundImage.setImageBitmap((Bitmap) savedInstanceState.getParcelable(Constants.IMAGE));
             createViewAttacher(savedInstanceState);
-        }
+        }*/
 
         loadImageToView();
 
@@ -53,13 +48,13 @@ public class ImageFragment extends Fragment {
             mMediaInfo.getLoader().loadMedia(getActivity(), backgroundImage, new MediaLoader.SuccessCallback() {
                 @Override
                 public void onSuccess() {
-                    createViewAttacher(getArguments());
+                    // createViewAttacher(getArguments());
                 }
             });
         }
     }
 
-    private void createViewAttacher(Bundle savedInstanceState) {
+    /*private void createViewAttacher(Bundle savedInstanceState) {
         if (savedInstanceState.getBoolean(Constants.ZOOM)) {
             photoViewAttacher = new PhotoViewAttacher(backgroundImage);
         }
@@ -73,9 +68,9 @@ public class ImageFragment extends Fragment {
         outState.putParcelable(Constants.IMAGE, ((BitmapDrawable) backgroundImage.getDrawable()).getBitmap());
         outState.putBoolean(Constants.ZOOM, photoViewAttacher != null);
         super.onSaveInstanceState(outState);
-    }
+    }*/
 
-    private boolean isViewPagerActive() {
-        return viewPager != null;
-    }
+    // private boolean isViewPagerActive() {
+    //    return viewPager != null;
+    // }
 }

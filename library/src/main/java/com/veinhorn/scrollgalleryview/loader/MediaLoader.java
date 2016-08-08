@@ -7,7 +7,6 @@ import android.widget.ImageView;
  * Implementation may load image from some sources, such as remote url.
  */
 public interface MediaLoader {
-
     /**
      * @return true if implementation load's image, otherwise false
      */
