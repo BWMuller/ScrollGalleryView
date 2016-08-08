@@ -1,26 +1,35 @@
 package com.veinhorn.scrollgalleryview.builder;
 
-public class GalleryBuilder implements Gallery[GalleryBuilder] {
-    private Context context;
+import android.app.Activity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
+
+import com.veinhorn.scrollgalleryview.MediaInfo;
+import com.veinhorn.scrollgalleryview.ScrollGalleryView;
+
+import java.util.List;
+
+public class GalleryBuilder implements Gallery<GalleryBuilder> {
+    private Activity activity;
     private ScrollGalleryView gallery;
 
-    public GalleryBuilder(Context context) {
-        this.context = context;
+    public GalleryBuilder(Activity activity) {
+        this.activity = activity;
     }
 
     @Override public GalleryBuilder fromView(int id) {
-        gallery = context.findViewById(id);
+        gallery = (ScrollGalleryView) activity.findViewById(id);
         return this;
     }
 
     @Override public GalleryBuilder withFragmentManager(FragmentManager fragmentManager) {
-      gallery.setFragmentManager(FragmentManager fragmentManager);
-      return this;
+        gallery.setFragmentManager(fragmentManager);
+        return this;
     }
 
     @Override public GalleryBuilder withZoom(boolean zoomEnabled) {
-      gallery.setZoom(zoomEnabled);
-      return this;
+        gallery.setZoom(zoomEnabled);
+        return this;
     }
 
     @Override public GalleryBuilder withThumbnailSize(int thumbnailSize) {
@@ -29,26 +38,26 @@ public class GalleryBuilder implements Gallery[GalleryBuilder] {
     }
 
     @Override public GalleryBuilder addMedia(MediaInfo info) {
-      gallery.addMedia(info);
-      return this;
+        gallery.addMedia(info);
+        return this;
     }
 
     @Override public GalleryBuilder addMedia(List<MediaInfo> infos) {
-      gallery.addMedia(infos);
-      return this;
+        gallery.addMedia(infos);
+        return this;
     }
 
     @Override public GalleryBuilder withHiddenThumbnails(boolean enabled) {
-      gallery.hideThumbnails(enabled);
-      return this;
+        gallery.hideThumbnails(enabled);
+        return this;
     }
 
     @Override public GalleryBuilder withOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
-      gallery.addOnPageChangeListener(listener);
-      return this;
+        gallery.addOnPageChangeListener(listener);
+        return this;
     }
 
     public ScrollGalleryView build() {
-      return gallery;
+        return gallery;
     }
 }

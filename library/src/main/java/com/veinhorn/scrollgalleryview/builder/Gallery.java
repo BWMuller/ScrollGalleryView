@@ -1,7 +1,14 @@
 package com.veinhorn.scrollgalleryview.builder;
 
-/** Containes all availible methods of the ScrollGalleryView API */
-public interface Gallery[T] {
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
+
+import com.veinhorn.scrollgalleryview.MediaInfo;
+
+import java.util.List;
+
+/** Contains all available methods of the ScrollGalleryView API */
+public interface Gallery<T> {
     /** Finds a ScrollGalleryView that was identified by id attribute from the XML */
     T fromView(int id);
 
@@ -23,6 +30,6 @@ public interface Gallery[T] {
     /** Hides a horizontally scrolling View in the bottom of the screen */
     T withHiddenThumbnails(boolean enabled);
 
-    /** Specifies OnPageChangeListener for internel ViewPager */
+    /** Specifies OnPageChangeListener for internal ViewPager */
     T withOnPageChangeListener(ViewPager.OnPageChangeListener listener);
 }
