@@ -91,7 +91,7 @@ public class MainActivity extends FragmentActivity {
 
 ## License
 
-    Copyright 2015, 2015 Boris Korogvich
+    Copyright 2015, 2016 Boris Korogvich
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
