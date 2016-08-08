@@ -10,20 +10,20 @@ import java.util.List;
 /**
  * Created by veinhorn on 8.8.16.
  */
-public class MediaInfoBuilder {
+public class MediaBuilder {
     private List<MediaInfo> infos;
 
-    public MediaInfoBuilder() {
+    public MediaBuilder() {
         infos = new ArrayList<>();
     }
 
     // TODO: Check here if have image or video format and create proper loader using MediaLoaderFactory
-    public MediaInfoBuilder fromUrl(String url) {
+    public MediaBuilder fromUrl(String url) {
         return this;
     }
 
     /** Loads image from resource */
-    public MediaInfoBuilder fromResource(int resourceId) {
+    public MediaBuilder fromResource(int resourceId) {
         MediaLoader mediaLoader = new FromResourceImageLoader(resourceId);
         MediaInfo info = new MediaInfo(mediaLoader);
         infos.add(info);
@@ -31,7 +31,7 @@ public class MediaInfoBuilder {
     }
 
     /** Loads images from array of resources */
-    public MediaInfoBuilder fromResource(Integer... resourceIds) {
+    public MediaBuilder fromResource(Integer... resourceIds) {
         for (int resourceId : resourceIds) {
             infos.add(new MediaInfo(new FromResourceImageLoader(resourceId)));
         }
