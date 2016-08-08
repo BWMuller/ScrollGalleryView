@@ -80,6 +80,7 @@ public class ScrollGalleryView extends LinearLayout {
         return this;
     }
 
+    /** Returns inner ViewPager */
     public ViewPager getViewPager() {
         return viewPager;
     }
