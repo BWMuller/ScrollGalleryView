@@ -3,12 +3,14 @@ package com.veinhorn.scrollgalleryview;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.veinhorn.scrollgalleryview.loader.MediaLoader;
 
@@ -22,6 +24,7 @@ public class ImageFragment extends Fragment {
     private MediaInfo mMediaInfo;
 
     private HackyViewPager viewPager;
+    private ProgressBar progressBar;
     private ImageView backgroundImage;
     private PhotoViewAttacher photoViewAttacher;
 
@@ -34,12 +37,15 @@ public class ImageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.image_fragment, container, false);
         backgroundImage = (ImageView) rootView.findViewById(R.id.backgroundImage);
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressbar);
+        progressBar.setVisibility(View.VISIBLE);
         viewPager = (HackyViewPager) getActivity().findViewById(R.id.viewPager);
 
         if (savedInstanceState != null) {
             boolean isLocked = savedInstanceState.getBoolean(Constants.IS_LOCKED, false);
             viewPager.setLocked(isLocked);
-            backgroundImage.setImageBitmap((Bitmap) savedInstanceState.getParcelable(Constants.IMAGE));
+            if (savedInstanceState.containsKey(Constants.IMAGE))
+                backgroundImage.setImageBitmap((Bitmap) savedInstanceState.getParcelable(Constants.IMAGE));
             createViewAttacher(savedInstanceState);
         }
 
@@ -50,9 +56,17 @@ public class ImageFragment extends Fragment {
 
     private void loadImageToView() {
         if (mMediaInfo != null) {
+            if (mMediaInfo.getBackgroundColor() != -1) {
+                backgroundImage.setBackgroundResource(mMediaInfo.getBackgroundColor());
+            }
+            if (mMediaInfo.getPlaceholder() != -1) {
+                backgroundImage.setImageResource(mMediaInfo.getPlaceholder());
+            }
+            mMediaInfo.setCurrentImageView(backgroundImage);
             mMediaInfo.getLoader().loadMedia(getActivity(), backgroundImage, new MediaLoader.SuccessCallback() {
                 @Override
                 public void onSuccess() {
+                    progressBar.setVisibility(View.GONE);
                     createViewAttacher(getArguments());
                 }
             });
@@ -70,7 +84,8 @@ public class ImageFragment extends Fragment {
         if (isViewPagerActive()) {
             outState.putBoolean(Constants.IS_LOCKED, viewPager.isLocked());
         }
-        outState.putParcelable(Constants.IMAGE, ((BitmapDrawable) backgroundImage.getDrawable()).getBitmap());
+        if (backgroundImage.getDrawable() instanceof BitmapDrawable)
+            outState.putParcelable(Constants.IMAGE, ((BitmapDrawable) backgroundImage.getDrawable()).getBitmap());
         outState.putBoolean(Constants.ZOOM, photoViewAttacher != null);
         super.onSaveInstanceState(outState);
     }

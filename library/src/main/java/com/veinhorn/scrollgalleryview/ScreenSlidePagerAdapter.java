@@ -33,6 +33,14 @@ public class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         return fragment;
     }
 
+    public MediaInfo getMediaItem(int position) {
+        MediaInfo mediaInfo = null;
+        if (position < mListOfMedia.size()) {
+            mediaInfo = mListOfMedia.get(position);
+        }
+        return mediaInfo;
+    }
+
     private Fragment loadImageFragment(MediaInfo mediaInfo) {
         ImageFragment fragment = new ImageFragment();
         fragment.setMediaInfo(mediaInfo);

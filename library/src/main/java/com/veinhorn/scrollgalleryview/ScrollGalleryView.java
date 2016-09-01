@@ -1,13 +1,18 @@
 package com.veinhorn.scrollgalleryview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ThumbnailUtils;
 import android.os.Build;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.Display;
@@ -34,6 +39,10 @@ public class ScrollGalleryView extends LinearLayout {
 
     // Options
     private int thumbnailSize; // width and height in pixels
+    int thumbnailMarginTop = 10;
+    int thumbnailMarginLeft = 10;
+    int thumbnailMarginRight = 10;
+    int thumbnailMarginBottom = 10;
     private boolean zoomEnabled;
     private boolean thumbnailsHiddenEnabled;
     //
@@ -56,8 +65,12 @@ public class ScrollGalleryView extends LinearLayout {
             viewPager.setCurrentItem((int) v.getTag(), true);
         }
     };
-    private PagerAdapter pagerAdapter;
+    private ScreenSlidePagerAdapter pagerAdapter;
     private List<MediaInfo> mListOfMedia;
+
+    public ScrollGalleryView(Context context) {
+        this(context, null);
+    }
 
     public ScrollGalleryView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -66,8 +79,17 @@ public class ScrollGalleryView extends LinearLayout {
 
         setOrientation(VERTICAL);
         displayProps = getDisplaySize();
+
+        @LayoutRes int layout = R.layout.scroll_gallery_view;
+        if (attrs != null) {
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ScrollGalleryView, 0, 0);
+
+            layout = a.getResourceId(R.styleable.ScrollGalleryView_sgvBaseLayout, R.layout.scroll_gallery_view);
+            a.recycle();
+        }
+
         LayoutInflater inflater = LayoutInflater.from(context);
-        inflater.inflate(R.layout.scroll_gallery_view, this, true);
+        inflater.inflate(layout, this, true);
 
         horizontalScrollView = (HorizontalScrollView) findViewById(R.id.thumbnails_scroll_view);
 
@@ -89,12 +111,20 @@ public class ScrollGalleryView extends LinearLayout {
         return addMedia(Collections.singletonList(mediaInfo));
     }
 
+    private int placeholder = -1;
+
+    public ScrollGalleryView setPlaceholder(@DrawableRes int placeholder) {
+        this.placeholder = placeholder;
+        return this;
+    }
+
     public ScrollGalleryView addMedia(List<MediaInfo> infos) {
         if (infos == null) {
             throw new NullPointerException("Infos may not be null!");
         }
 
         for (MediaInfo info : infos) {
+            info.setPlaceholder(placeholder);
             mListOfMedia.add(info);
 
             final ImageView thumbnail = addThumbnail(getDefaultThumbnail());
@@ -112,7 +142,9 @@ public class ScrollGalleryView extends LinearLayout {
 
 
     private Bitmap getDefaultThumbnail() {
-        return ((BitmapDrawable) getContext().getResources().getDrawable(R.drawable.placeholder_image)).getBitmap();
+        if (placeholder == -1)
+            return ((BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.placeholder_image)).getBitmap();
+        return BitmapFactory.decodeResource(context.getResources(), placeholder);
     }
 
     /**
@@ -128,6 +160,18 @@ public class ScrollGalleryView extends LinearLayout {
 
     public ScrollGalleryView setThumbnailSize(int thumbnailSize) {
         this.thumbnailSize = thumbnailSize;
+        return this;
+    }
+
+    public ScrollGalleryView setThumbnailMargin(int margin) {
+        return setThumbnailMargin(margin, margin, margin, margin);
+    }
+
+    public ScrollGalleryView setThumbnailMargin(int left, int top, int right, int bottom) {
+        thumbnailMarginLeft = left;
+        thumbnailMarginTop = top;
+        thumbnailMarginRight = right;
+        thumbnailMarginBottom = bottom;
         return this;
     }
 
@@ -156,7 +200,7 @@ public class ScrollGalleryView extends LinearLayout {
 
     private ImageView addThumbnail(Bitmap image) {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(thumbnailSize, thumbnailSize);
-        lp.setMargins(10, 10, 10, 10);
+        lp.setMargins(thumbnailMarginLeft, thumbnailMarginTop, thumbnailMarginRight, thumbnailMarginBottom);
         Bitmap thumbnail = createThumbnail(image);
 
         ImageView thumbnailView = createThumbnailView(lp, thumbnail);
@@ -178,11 +222,34 @@ public class ScrollGalleryView extends LinearLayout {
         return ThumbnailUtils.extractThumbnail(image, thumbnailSize, thumbnailSize);
     }
 
+    private
+    @IdRes
+    int viewPagerResourceId = R.id.viewPager;
+
     private void initializeViewPager() {
-        viewPager = (HackyViewPager) findViewById(R.id.viewPager);
+        viewPager = (HackyViewPager) findViewById(viewPagerResourceId);
         pagerAdapter = new ScreenSlidePagerAdapter(fragmentManager, mListOfMedia, zoomEnabled);
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(viewPagerChangeListener);
+    }
+
+    public void removeItem(MediaInfo mediaInfo) {
+        if (mListOfMedia.contains(mediaInfo)) {
+            int index = mListOfMedia.indexOf(mediaInfo);
+            thumbnailsContainer.removeViewAt(index);
+            mListOfMedia.remove(mediaInfo);
+            viewPager.removeAllViews();
+            //make this to update the pager
+            viewPager.setAdapter(pagerAdapter);
+        }
+    }
+
+    public MediaInfo getItem(int position) {
+        return pagerAdapter.getMediaItem(position);
+    }
+
+    public MediaInfo getCurrentItem() {
+        return pagerAdapter.getMediaItem(viewPager.getCurrentItem());
     }
 
     private void scroll(View thumbnail) {
@@ -201,5 +268,9 @@ public class ScrollGalleryView extends LinearLayout {
             inSampleSize *= 2;
         }
         return inSampleSize;
+    }
+
+    public int getItemCount() {
+        return mListOfMedia.size();
     }
 }
