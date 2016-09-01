@@ -36,6 +36,8 @@ public class ScrollGalleryView extends LinearLayout {
     private FragmentManager fragmentManager;
     private Context context;
     private Point displayProps;
+    private PagerAdapter pagerAdapter;
+    private List<MediaInfo> mListOfMedia;
 
     // Options
     private int thumbnailSize; // width and height in pixels
@@ -45,22 +47,21 @@ public class ScrollGalleryView extends LinearLayout {
     int thumbnailMarginBottom = 10;
     private boolean zoomEnabled;
     private boolean thumbnailsHiddenEnabled;
-    //
 
     // Views
     private LinearLayout thumbnailsContainer;
     private HorizontalScrollView horizontalScrollView;
+    private ViewPager viewPager;
+
+    // Listeners
     private final ViewPager.SimpleOnPageChangeListener viewPagerChangeListener = new ViewPager.SimpleOnPageChangeListener() {
-        @Override
-        public void onPageSelected(int position) {
+        @Override public void onPageSelected(int position) {
             scroll(thumbnailsContainer.getChildAt(position));
         }
     };
-    //
-    private ViewPager viewPager;
+
     private final OnClickListener thumbnailOnClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
+        @Override public void onClick(View v) {
             scroll(v);
             viewPager.setCurrentItem((int) v.getTag(), true);
         }
@@ -101,6 +102,10 @@ public class ScrollGalleryView extends LinearLayout {
         this.fragmentManager = fragmentManager;
         initializeViewPager();
         return this;
+    }
+
+    public ViewPager getViewPager() {
+        return viewPager;
     }
 
     public ScrollGalleryView addMedia(MediaInfo mediaInfo) {
