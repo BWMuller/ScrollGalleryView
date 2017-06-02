@@ -33,41 +33,42 @@ import java.util.List;
  * Created by veinhorn on 6.8.15.
  */
 public class ScrollGalleryView extends LinearLayout {
-    private FragmentManager fragmentManager;
-    private Context context;
-    private Point displayProps;
-    private PagerAdapter pagerAdapter;
-    private List<MediaInfo> mListOfMedia;
-
-    // Options
-    private int thumbnailSize; // width and height in pixels
     int thumbnailMarginTop = 10;
     int thumbnailMarginLeft = 10;
     int thumbnailMarginRight = 10;
     int thumbnailMarginBottom = 10;
+    private FragmentManager fragmentManager;
+    private Context context;
+    private Point displayProps;
+    // Options
+    private int thumbnailSize; // width and height in pixels
     private boolean zoomEnabled;
     private boolean thumbnailsHiddenEnabled;
 
     // Views
     private LinearLayout thumbnailsContainer;
     private HorizontalScrollView horizontalScrollView;
-    private ViewPager viewPager;
-
     // Listeners
     private final ViewPager.SimpleOnPageChangeListener viewPagerChangeListener = new ViewPager.SimpleOnPageChangeListener() {
-        @Override public void onPageSelected(int position) {
+        @Override
+        public void onPageSelected(int position) {
             scroll(thumbnailsContainer.getChildAt(position));
         }
     };
-
+    private ViewPager viewPager;
     private final OnClickListener thumbnailOnClickListener = new OnClickListener() {
-        @Override public void onClick(View v) {
+        @Override
+        public void onClick(View v) {
             scroll(v);
             viewPager.setCurrentItem((int) v.getTag(), true);
         }
     };
     private ScreenSlidePagerAdapter pagerAdapter;
     private List<MediaInfo> mListOfMedia;
+    private int placeholder = -1;
+    private
+    @IdRes
+    int viewPagerResourceId = R.id.viewPager;
 
     public ScrollGalleryView(Context context) {
         this(context, null);
@@ -110,21 +111,25 @@ public class ScrollGalleryView extends LinearLayout {
 
     /**
      * Set up OnPageChangeListener for internal ViewPager
+     *
      * @param listener
      */
     public void addOnPageChangeListener(final ViewPager.OnPageChangeListener listener) {
         viewPager.clearOnPageChangeListeners();
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 listener.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
-            @Override public void onPageSelected(int position) {
+            @Override
+            public void onPageSelected(int position) {
                 scroll(thumbnailsContainer.getChildAt(position));
                 listener.onPageSelected(position);
             }
 
-            @Override public void onPageScrollStateChanged(int state) {
+            @Override
+            public void onPageScrollStateChanged(int state) {
                 listener.onPageScrollStateChanged(state);
             }
         });
@@ -137,8 +142,6 @@ public class ScrollGalleryView extends LinearLayout {
 
         return addMedia(Collections.singletonList(mediaInfo));
     }
-
-    private int placeholder = -1;
 
     public ScrollGalleryView setPlaceholder(@DrawableRes int placeholder) {
         this.placeholder = placeholder;
@@ -167,26 +170,10 @@ public class ScrollGalleryView extends LinearLayout {
         return this;
     }
 
-
     private Bitmap getDefaultThumbnail() {
         if (placeholder == -1)
             return ((BitmapDrawable) ContextCompat.getDrawable(context, R.drawable.placeholder_image)).getBitmap();
         return BitmapFactory.decodeResource(context.getResources(), placeholder);
-    }
-
-    /**
-     * Set the current item displayed in the view pager.
-     *
-     * @param i a zero-based index
-     * @return
-     */
-    public ScrollGalleryView setCurrentItem(int i) {
-        viewPager.setCurrentItem(i, false);
-        return this;
-    }
-
-    public int getCurrentItem() {
-        return viewPager.getCurrentItem();
     }
 
     public ScrollGalleryView setThumbnailSize(int thumbnailSize) {
@@ -253,10 +240,6 @@ public class ScrollGalleryView extends LinearLayout {
         return ThumbnailUtils.extractThumbnail(image, thumbnailSize, thumbnailSize);
     }
 
-    private
-    @IdRes
-    int viewPagerResourceId = R.id.viewPager;
-
     private void initializeViewPager() {
         viewPager = (HackyViewPager) findViewById(viewPagerResourceId);
         pagerAdapter = new ScreenSlidePagerAdapter(fragmentManager, mListOfMedia, zoomEnabled);
@@ -281,6 +264,17 @@ public class ScrollGalleryView extends LinearLayout {
 
     public MediaInfo getCurrentItem() {
         return pagerAdapter.getMediaItem(viewPager.getCurrentItem());
+    }
+
+    /**
+     * Set the current item displayed in the view pager.
+     *
+     * @param i a zero-based index
+     * @return
+     */
+    public ScrollGalleryView setCurrentItem(int i) {
+        viewPager.setCurrentItem(i, false);
+        return this;
     }
 
     private void scroll(View thumbnail) {
